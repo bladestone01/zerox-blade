@@ -27,21 +27,21 @@ class litellmmodel(BaseModel):
         Initializes the Litellm model interface.
         :param model: The model to use for generating completions, defaults to "gpt-4o-mini". Refer: https://docs.litellm.ai/docs/providers
         :type model: str, optional
-        
+
         :param kwargs: Additional keyword arguments to pass to self.completion -> litellm.completion. Refer: https://docs.litellm.ai/docs/providers and https://docs.litellm.ai/docs/completion/input
         """
         super().__init__(model=model, **kwargs)
 
         ## calling custom methods to validate the environment and model
-        self.validate_environment()
-        self.validate_model()
-        self.validate_access()
+        # self.validate_environment()
+        # self.validate_model()
+        # self.validate_access()
 
     @property
     def system_prompt(self) -> str:
         '''Returns the system prompt for the model.'''
         return self._system_prompt
-    
+
     @system_prompt.setter
     def system_prompt(self, prompt: str) -> None:
         '''
@@ -56,17 +56,17 @@ class litellmmodel(BaseModel):
 
         if not env_config["keys_in_environment"]:
             raise MissingEnvironmentVariables(extra_info=env_config)
-        
+
     def validate_model(self) -> None:
         '''Validates the model to ensure it is a vision model.'''
         if not litellm.supports_vision(model=self.model):
             raise NotAVisionModel(extra_info={"model": self.model})
-        
+
     def validate_access(self) -> None:
         """Validates access to the model -> if environment variables are set correctly with correct values."""
         if not litellm.check_valid_key(model=self.model,api_key=None):
             raise ModelAccessError(extra_info={"model": self.model})
-        
+
 
     async def completion(
         self,
@@ -101,7 +101,7 @@ class litellmmodel(BaseModel):
                     output_tokens=response["usage"]["completion_tokens"],
                 )
             return response
-        
+
         except Exception as err:
             raise Exception(Messages.COMPLETION_ERROR.format(err))
 
